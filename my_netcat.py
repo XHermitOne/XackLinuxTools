@@ -210,6 +210,7 @@ class NetCat:
                     print(response)
                     buffer = input(CLIENT_SHELL_PROMPT)
                     if buffer == EXIT_CMD:
+                        # self.socket.send(os.linesep.encode())
                         info('...Exit', force_print=True)
                         break
 
@@ -239,7 +240,7 @@ class NetCat:
                 info(u'Запрос от %s. Обработка' % str(address_socket))
                 # Создаем объект нового потока, который указывает на нашу функцию handle, и передаем этой
                 # функции клиентское соединение
-                client_thread = threading.Thread(target=self.handle, args=(client_socket,))
+                client_thread = threading.Thread(target=self.handle, args=(client_socket, address_socket))
                 client_thread.start()
         except KeyboardInterrupt:
             info('Exit server', force_print=True)
@@ -248,7 +249,7 @@ class NetCat:
             # self.socket.close()
             # sys.exit()
 
-    def handle(self, client_socket):
+    def handle(self, client_socket, address_socket):
         """
         Функция - обработчик клиентского запроса.
 
@@ -296,6 +297,7 @@ class NetCat:
                 fatal(f'server killed {e}')
                 self.socket.close()
                 # sys.exit()
+        info(u'...Выход из обработки %s' % str(address_socket))
 
 
 def main(*argv):
