@@ -206,10 +206,10 @@ class NetCat:
                     buffer += '\n'
                     self.socket.send(buffer.encode())
         except KeyboardInterrupt:
-            info('User terminated')
+            info('User terminated', force_print=True)
             # Закрываем соединение по Ctrl-C
             self.socket.close()
-            # sys.exit()
+            sys.exit()
 
     def listen(self):
         """
@@ -225,6 +225,7 @@ class NetCat:
             # Получаем клиентский сокет в переменной client_socket и
             # подробности об удаленном соединении в переменной address_socket
             client_socket, address_socket = self.socket.accept()
+            info(u'Запрос от %s. Обработка' % str(address_socket))
             # Создаем объект нового потока, который указывает на нашу функцию handle, и передаем этой
             # функции клиентское соединение
             client_thread = threading.Thread(target=self.handle, args=(client_socket,))
@@ -271,6 +272,7 @@ class NetCat:
                     fatal(f'server killed {e}')
                     self.socket.close()
                     # sys.exit()
+                    break
 
 
 def main(*argv):
@@ -282,7 +284,7 @@ def main(*argv):
     """
     global DEBUG_MODE
 
-    target =DEFAULT_TARGET
+    target = DEFAULT_TARGET
     port = DEFAULT_PORT
     listen = False
     command = False
