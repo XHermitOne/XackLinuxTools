@@ -236,7 +236,7 @@ class NetCat:
         except KeyboardInterrupt:
             info('Exit server', force_print=True)
             # Закрываем соединение по Ctrl-C
-            self.socket.close()
+            # self.socket.close()
             sys.exit()
 
     def handle(self, client_socket):
