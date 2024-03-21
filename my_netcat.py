@@ -51,6 +51,8 @@ CONSOLE = rich.console.Console()
 DEFAULT_TARGET = '0.0.0.0'
 DEFAULT_PORT = 5555
 
+CLIENT_SHELL_PROMPT = '> '
+
 
 def debug(message=u'', force_print=False):
     """
@@ -202,14 +204,14 @@ class NetCat:
                 if response:
                     # Вывод результат от сервера
                     print(response)
-                    buffer = input('> ')
-                    buffer += '\n'
+                    buffer = input(CLIENT_SHELL_PROMPT)
+                    buffer += os.linesep
                     self.socket.send(buffer.encode())
         except KeyboardInterrupt:
             info('User terminated', force_print=True)
             # Закрываем соединение по Ctrl-C
             self.socket.close()
-            sys.exit()
+            # sys.exit()
 
     def listen(self):
         """
@@ -221,15 +223,21 @@ class NetCat:
         self.socket.bind((self.target, self.port))
         # Просим сервер начать прослушивание, указав, что отложенных соединений должно быть не больше 5
         self.socket.listen(5)
-        while True:
-            # Получаем клиентский сокет в переменной client_socket и
-            # подробности об удаленном соединении в переменной address_socket
-            client_socket, address_socket = self.socket.accept()
-            info(u'Запрос от %s. Обработка' % str(address_socket))
-            # Создаем объект нового потока, который указывает на нашу функцию handle, и передаем этой
-            # функции клиентское соединение
-            client_thread = threading.Thread(target=self.handle, args=(client_socket,))
-            client_thread.start()
+        try:
+            while True:
+                # Получаем клиентский сокет в переменной client_socket и
+                # подробности об удаленном соединении в переменной address_socket
+                client_socket, address_socket = self.socket.accept()
+                info(u'Запрос от %s. Обработка' % str(address_socket))
+                # Создаем объект нового потока, который указывает на нашу функцию handle, и передаем этой
+                # функции клиентское соединение
+                client_thread = threading.Thread(target=self.handle, args=(client_socket,))
+                client_thread.start()
+        except KeyboardInterrupt:
+            info('Exit server', force_print=True)
+            # Закрываем соединение по Ctrl-C
+            self.socket.close()
+            # sys.exit()
 
     def handle(self, client_socket):
         """
@@ -261,7 +269,7 @@ class NetCat:
             cmd_buffer = b''
             while True:
                 try:
-                    client_socket.send(b'#> ')
+                    client_socket.send(b'CONNECTED')
                     while os.linesep not in cmd_buffer.decode():
                         cmd_buffer += client_socket.recv(64)
                         response = get_text_executed_cmd(cmd_buffer.decode())
@@ -339,7 +347,9 @@ def main(*argv):
         if listen:
             buffer = ''
         else:
-            buffer = sys.stdin.read()
+            # buffer = sys.stdin.read()
+            # buffer = 'uname -a'
+            buffer = ''
 
         nc = NetCat(target=target, port=port,
                     listen_mode=listen, command_mode=command,
