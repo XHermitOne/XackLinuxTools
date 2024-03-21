@@ -237,7 +237,7 @@ class NetCat:
             info('Exit server', force_print=True)
             # Закрываем соединение по Ctrl-C
             self.socket.close()
-            # sys.exit()
+            sys.exit()
 
     def handle(self, client_socket):
         """
