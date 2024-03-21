@@ -286,7 +286,7 @@ class NetCat:
                             break
 
                         cmd_buffer += client_socket.recv(64)
-                        if cmd_buffer == EXIT_CMD:
+                        if cmd_buffer.decode() == EXIT_CMD:
                             self.socket.close()
                             break
 
@@ -295,7 +295,7 @@ class NetCat:
                             client_socket.send(response.encode())
                             cmd_buffer = b''
 
-                    if cmd_buffer == EXIT_CMD:
+                    if cmd_buffer.decode() == EXIT_CMD:
                         self.socket.close()
                         break
                     if self.exit_server:
