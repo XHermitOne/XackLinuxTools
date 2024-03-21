@@ -41,7 +41,7 @@ except ImportError:
     print(u'Not found rich library. Install: pip3 install rich')
     sys.exit(1)
 
-__version__ = (0, 0, 0, 1)
+__version__ = (0, 0, 1, 1)
 
 # Режим отладки
 DEBUG_MODE = False
@@ -51,7 +51,9 @@ CONSOLE = rich.console.Console()
 DEFAULT_TARGET = '0.0.0.0'
 DEFAULT_PORT = 5555
 
-CLIENT_SHELL_PROMPT = '> '
+CLIENT_SHELL_PROMPT = '#> '
+
+EXIT_CMD = 'exit'
 
 
 def debug(message=u'', force_print=False):
@@ -205,6 +207,11 @@ class NetCat:
                     # Вывод результат от сервера
                     print(response)
                     buffer = input(CLIENT_SHELL_PROMPT)
+                    if buffer == EXIT_CMD:
+                        print(os.linesep)
+                        info('...Exit', force_print=True)
+                        break
+
                     buffer += os.linesep
                     self.socket.send(buffer.encode())
         except KeyboardInterrupt:
@@ -236,7 +243,7 @@ class NetCat:
         except KeyboardInterrupt:
             info('Exit server', force_print=True)
             # Закрываем соединение по Ctrl-C
-            # self.socket.close()
+            self.socket.close()
             # sys.exit()
 
     def handle(self, client_socket):
@@ -267,8 +274,8 @@ class NetCat:
         elif self.command_mode:
             # Режим командной оболочки
             cmd_buffer = b''
-            while True:
-                try:
+            try:
+                while True:
                     client_socket.send(b'CONNECTED')
                     while os.linesep not in cmd_buffer.decode():
                         cmd_buffer += client_socket.recv(64)
@@ -276,11 +283,10 @@ class NetCat:
                         if response:
                             client_socket.send(response.encode())
                             cmd_buffer = b''
-                except Exception as e:
-                    fatal(f'server killed {e}')
-                    self.socket.close()
-                    # sys.exit()
-                    break
+            except Exception as e:
+                fatal(f'server killed {e}')
+                self.socket.close()
+                # sys.exit()
 
 
 def main(*argv):
@@ -344,12 +350,11 @@ def main(*argv):
             error(msg)
 
     try:
-        if listen:
-            buffer = ''
-        else:
-            # buffer = sys.stdin.read()
-            # buffer = 'uname -a'
-            buffer = ''
+        # if listen:
+        #     buffer = ''
+        # else:
+        #     buffer = sys.stdin.read()
+        buffer = ''
 
         nc = NetCat(target=target, port=port,
                     listen_mode=listen, command_mode=command,
