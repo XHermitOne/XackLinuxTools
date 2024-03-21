@@ -163,12 +163,14 @@ class NetCat:
         self.listen_mode = listen_mode
         self.command_mode = command_mode
         self.execute_cmd = execute_cmd
-        self. upload_filename = upload_filename
+        self.upload_filename = upload_filename
         self.buffer = buffer
 
         # Создание объекта сокета
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        self.exit_server = False
 
     def run(self):
         """
@@ -208,7 +210,6 @@ class NetCat:
                     print(response)
                     buffer = input(CLIENT_SHELL_PROMPT)
                     if buffer == EXIT_CMD:
-                        print(os.linesep)
                         info('...Exit', force_print=True)
                         break
 
@@ -242,6 +243,7 @@ class NetCat:
                 client_thread.start()
         except KeyboardInterrupt:
             info('Exit server', force_print=True)
+            self.exit_server = True
             # Закрываем соединение по Ctrl-C
             # self.socket.close()
             # sys.exit()
@@ -278,11 +280,18 @@ class NetCat:
                 while True:
                     client_socket.send(b'CONNECTED')
                     while os.linesep not in cmd_buffer.decode():
+                        if self.exit_server:
+                            self.socket.close()
+                            break
+
                         cmd_buffer += client_socket.recv(64)
                         response = get_text_executed_cmd(cmd_buffer.decode())
                         if response:
                             client_socket.send(response.encode())
                             cmd_buffer = b''
+                    if self.exit_server:
+                        self.socket.close()
+                        break
             except Exception as e:
                 fatal(f'server killed {e}')
                 self.socket.close()
