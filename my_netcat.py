@@ -210,7 +210,7 @@ class NetCat:
                     print(response)
                     buffer = input(CLIENT_SHELL_PROMPT)
                     if buffer == EXIT_CMD:
-                        # self.socket.send(os.linesep.encode())
+                        self.socket.send(EXIT_CMD.encode())
                         info('...Exit', force_print=True)
                         break
 
@@ -286,10 +286,18 @@ class NetCat:
                             break
 
                         cmd_buffer += client_socket.recv(64)
+                        if cmd_buffer == EXIT_CMD:
+                            self.socket.close()
+                            break
+
                         response = get_text_executed_cmd(cmd_buffer.decode())
                         if response:
                             client_socket.send(response.encode())
                             cmd_buffer = b''
+
+                    if cmd_buffer == EXIT_CMD:
+                        self.socket.close()
+                        break
                     if self.exit_server:
                         self.socket.close()
                         break
