@@ -6,13 +6,14 @@
 
 import sys
 import os
+import socket
 try:
     import rich.console
 except ImportError:
     print(u'Not found rich library. Install: pip3 install rich')
     sys.exit(1)
 
-__version__ = (0, 0, 1, 2)
+__version__ = (0, 0, 2, 1)
 
 CONSOLE = rich.console.Console()
 
@@ -41,6 +42,7 @@ def print_logo():
 
 MAIN_MENUITEMS = '''
 1. Information / Информация
+2. Net tols / Сетевые инструменты
 0. Exit / Выход
 '''  # assuming you want to display menulist, having it as a tuple is useless
 
@@ -59,6 +61,8 @@ def main_menu(show_logo=True, show_menu=True):
 
     if target == '1':  # this is an equality operator, whereas = is used to assign a variable (This checks the equality basically)
         information_menu(show_logo=False, show_menu=True)
+    elif target == '2':
+        net_tools_menu(show_logo=False, show_menu=True)
     elif target == '0':
         CONSOLE.print('...exit', style='green')  # excessive indenting
         return
@@ -114,6 +118,53 @@ def information_menu(show_logo=True, show_menu=True):
     print_logo()
     CONSOLE.print(MAIN_MENUITEMS, style='green')
     return information_menu(show_logo=False, show_menu=True)
+
+
+NET_TOOLS_MENUITEMS = '''
+1. My NetCat server / NetCat сервер
+2. My NetCat client / NetCat клиент
+0. Return / Возврат
+'''
+
+
+def net_tools_menu(show_logo=True, show_menu=True):
+    """
+    Net tools menu function.
+
+    :return:
+    """
+    if show_logo:
+        print_logo()
+    if show_menu:
+        CONSOLE.print(NET_TOOLS_MENUITEMS, style='green')
+
+    target = CONSOLE.input('Pick an item from the menu / Выберите номер элемента меню: ')
+
+    if target == '1':
+        os.system('python3 my_netcat.py --version')
+        host_name = socket.gethostname()
+        host_ip = socket.gethostbyname(host_name)
+        CONSOLE.print(u'Host name / Имя компьютера:', host_name, u'IP address / IP адрес:', host_ip, style='cyan')
+        cmd = 'python3 my_netcat.py --debug --target=%s --port=5555 --listen --command' % host_ip
+        CONSOLE.print(cmd, style='cyan')
+        CONSOLE.print(u'Exit / Выход - Ctrl+C', style='cyan')
+        os.system(cmd)
+    elif target == '2':
+        os.system('python3 my_netcat.py --version')
+        host = input(u'Enter the server address / Введите адрес сервера:')
+        port = input(u'Enter the port / Введите порт:')
+        cmd = 'python3 my_netcat.py --debug --target=%s --port=%s' % (host, port)
+        CONSOLE.print(cmd, style='cyan')
+        CONSOLE.print(u'Exit / Выход - exit', style='cyan')
+        os.system(cmd)
+    elif target == '0':
+        return
+    else:
+        return net_tools_menu(show_logo=False, show_menu=False)
+
+    print_logo()
+    CONSOLE.print(MAIN_MENUITEMS, style='green')
+    return net_tools_menu(show_logo=False, show_menu=True)
 
 
 def main():

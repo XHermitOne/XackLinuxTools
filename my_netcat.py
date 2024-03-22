@@ -41,7 +41,7 @@ except ImportError:
     print(u'Not found rich library. Install: pip3 install rich')
     sys.exit(1)
 
-__version__ = (0, 0, 1, 1)
+__version__ = (0, 0, 1, 2)
 
 # Режим отладки
 DEBUG_MODE = False
@@ -340,7 +340,7 @@ def main(*argv):
             info(__doc__, force_print=True)
             sys.exit(0)
         elif option in ('-v', '--version'):
-            str_version = 'Версия: %s' % '.'.join([str(sign) for sign in __version__])
+            str_version = 'MyNetCat. Версия: %s' % '.'.join([str(sign) for sign in __version__])
             info(str_version, force_print=True)
             sys.exit(0)
         elif option in ('-d', '--debug'):
