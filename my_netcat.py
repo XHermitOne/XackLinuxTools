@@ -41,7 +41,7 @@ except ImportError:
     print(u'Not found rich library. Install: pip3 install rich')
     sys.exit(1)
 
-__version__ = (0, 0, 1, 2)
+__version__ = (0, 0, 2, 2)
 
 # Режим отладки
 DEBUG_MODE = False
@@ -140,6 +140,35 @@ def get_lines_executed_cmd(cmd):
     """
     output_text = get_text_executed_cmd(cmd)
     return output_text.split(sep=os.linesep)
+
+
+def get_my_host_ip():
+    """
+    Получить IP адрес текущего хоста.
+
+    :return: IP адрес или пустая строка в случае ошибки.
+    """
+    try:
+        import netifaces
+        interface_names = netifaces.interfaces()
+        # Удалить localhost
+        interface_names.remove('lo')
+        if interface_names:
+            if len(interface_names) > 1:
+                warning(u'Several host interfaces %s. Get first' % str(interface_names))
+            first_interface_name = interface_names[0]
+            interface_info = netifaces.ifaddresses(first_interface_name)[netifaces.AF_INET]
+            if interface_info:
+                if len(interface_info) > 1:
+                    warning(u'Several interface <%s> info %s. Get first' % (first_interface_name, str(interface_info)))
+                return interface_info[0].get('addr')
+            else:
+                warning(u'Not get interface info')
+        else:
+            warning(u'Not found host interfaces')
+    except:
+        fatal(u'Error get my host IP address')
+    return ''
 
 
 class NetCat:
@@ -317,7 +346,7 @@ def main(*argv):
     """
     global DEBUG_MODE
 
-    target = DEFAULT_TARGET
+    target = get_my_host_ip()
     port = DEFAULT_PORT
     listen = False
     command = False

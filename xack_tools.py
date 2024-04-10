@@ -13,7 +13,7 @@ except ImportError:
     print(u'Not found rich library. Install: pip3 install rich')
     sys.exit(1)
 
-__version__ = (0, 0, 2, 1)
+__version__ = (0, 0, 2, 2)
 
 CONSOLE = rich.console.Console()
 
@@ -42,7 +42,7 @@ def print_logo():
 
 MAIN_MENUITEMS = '''
 1. Information / Информация
-2. Net tols / Сетевые инструменты
+2. Net tools / Сетевые инструменты
 0. Exit / Выход
 '''  # assuming you want to display menulist, having it as a tuple is useless
 
@@ -142,8 +142,9 @@ def net_tools_menu(show_logo=True, show_menu=True):
 
     if target == '1':
         os.system('python3 my_netcat.py --version')
+        import my_netcat
         host_name = socket.gethostname()
-        host_ip = socket.gethostbyname(host_name)
+        host_ip = my_netcat.get_my_host_ip()
         CONSOLE.print(u'Host name / Имя компьютера:', host_name, u'IP address / IP адрес:', host_ip, style='cyan')
         cmd = 'python3 my_netcat.py --debug --target=%s --port=5555 --listen --command' % host_ip
         CONSOLE.print(cmd, style='cyan')
