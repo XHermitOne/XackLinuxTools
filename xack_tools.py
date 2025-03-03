@@ -20,7 +20,7 @@ except ImportError:
     print(u'Not found rich-menu library. Install: pip3 install rich-menu')
     sys.exit(1)
 
-__version__ = (0, 0, 3, 1)
+__version__ = (0, 0, 3, 2)
 
 CONSOLE = rich.console.Console()
 
@@ -63,7 +63,7 @@ def main_menu(show_logo=True, show_menu=True):
     if show_menu:
         menu = rich_menu.Menu(*MAIN_MENUITEMS,
                               color='green',
-                              rule_title='*',
+                              title='*',
                               align='left',
                               panel_title='',
                               selection_char='=>',
@@ -101,7 +101,7 @@ def information_menu(show_logo=True, show_menu=True):
     if show_menu:
         menu = rich_menu.Menu(*INFORMATION_MENUITEMS,
                               color='green',
-                              rule_title='Information / Информация',
+                              title='Information / Информация',
                               align='left',
                               panel_title='Information / Информация',
                               selection_char='=>',
@@ -154,7 +154,7 @@ def net_tools_menu(show_logo=True, show_menu=True):
     if show_menu:
         menu = rich_menu.Menu(*NET_TOOLS_MENUITEMS,
                               color='green',
-                              rule_title='Net tools / Сетевые инструменты',
+                              title='Net tools / Сетевые инструменты',
                               align='left',
                               panel_title='Net tools / Сетевые инструменты',
                               selection_char='=>',
